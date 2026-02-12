@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Part, PartSpecification } from '@/types/suppliers';
+import { Supplier } from '@/types/suppliers';
 import { useParts } from '@/contexts/SuppliersContext';
 import {
-  Dialog,
+  Dialog, 
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -106,7 +106,7 @@ export const SupplierFormDialog = ({ supplier, open, onOpenChange }: SupplierFor
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            />  
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
