@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Building2 } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Building2, Wrench } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import suppliers from '@/routes/suppliers';
+import taxonomies from '@/routes/taxonomies';
 import type { BreadcrumbItem, NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
@@ -51,7 +52,13 @@ const mainNavItems: NavItem[] = [
         title: 'Suppliers',
         href: suppliers.index.url(),
         icon: Building2
-    }
+    },
+    {
+        title: 'Taxonomies',
+        href: taxonomies.index.url(),
+        icon: Wrench
+    }    
+
 ];
 
 const rightNavItems: NavItem[] = [

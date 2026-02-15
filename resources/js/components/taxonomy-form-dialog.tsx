@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
-import { Supplier } from '@/types/suppliers';
-import * as SupplierRoutes from '@/routes/suppliers';
+import { Taxonomy } from '@/types/taxonomies';
+import * as TaxonomiesRoutes from '@/routes/taxonomies';
 import {
   Dialog, 
   DialogContent,
@@ -11,30 +11,33 @@ import {
 import { FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { slugify } from '@/lib/utils';
 
 
-interface SupplierFormDialogProps {
-  supplier?: Supplier | null;
+interface TaxonomyFormDialogProps {
+  taxonomy?: Taxonomy | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 
-export const SupplierFormDialog = ({ supplier, open, onOpenChange }: SupplierFormDialogProps) => {
-  const isEditing = !!supplier;
+export const TaxonomyFormDialog = ({ taxonomy, open, onOpenChange }: TaxonomyFormDialogProps) => {
+  const isEditing = !!taxonomy;
 
   const {data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
-    name: supplier?.name || ''
+    name: taxonomy?.name || '',
+    slug: taxonomy?.slug || ''
   })
 
 
   useEffect(() => {
     if (open) {
       
-      if (supplier) {
+      if (taxonomy) {
       
         setData({
-          name: supplier.name,
+          name: taxonomy.name,
+          slug: taxonomy.slug,
         });
       
       } else {
@@ -43,7 +46,7 @@ export const SupplierFormDialog = ({ supplier, open, onOpenChange }: SupplierFor
       
       }
     }
-  }, [open, supplier]);
+  }, [open, taxonomy]);
 
   const onSubmit = (e: any) => {
     e.preventDefault();
@@ -55,13 +58,13 @@ export const SupplierFormDialog = ({ supplier, open, onOpenChange }: SupplierFor
         },
     };
     
-    if (isEditing && supplier) {
+    if (isEditing && taxonomy) {
 
-      put(SupplierRoutes.update(supplier.id).url, options)
+      put(TaxonomiesRoutes.update(taxonomy.id).url, options)
 
     } else {
 
-      post(SupplierRoutes.store().url, options)
+      post(TaxonomiesRoutes.store().url, options)
 
     }
 
@@ -73,7 +76,7 @@ export const SupplierFormDialog = ({ supplier, open, onOpenChange }: SupplierFor
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Supplier' : 'Add New Supplier'}</DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit Taxonomy' : 'Add New Taxonomy'}</DialogTitle>
         </DialogHeader>
 
 
@@ -91,13 +94,25 @@ export const SupplierFormDialog = ({ supplier, open, onOpenChange }: SupplierFor
                 <FormMessage error={errors.name}/>
               </FormItem>
 
+              <FormItem>
+                <FormLabel error={!!errors.slug}>Slug *</FormLabel>
+                <FormControl>
+                  <input
+                    value={data.slug}
+                    onChange={e => setData('slug', slugify(e.target.value))}
+                    className={errors.slug ? 'border-destructive' : ''}
+                  />
+                </FormControl>
+                <FormMessage error={errors.slug}/>
+              </FormItem>              
+
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={processing}>
-                {isEditing ? 'Update Supplier' : 'Add Supplier'}
+                {isEditing ? 'Update Taxonomy' : 'Add Taxonomy'}
               </Button>
             </div>
           </form>

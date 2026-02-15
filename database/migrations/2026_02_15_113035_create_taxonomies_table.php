@@ -22,7 +22,17 @@ return new class extends Migration
             $table->id();
             $table->foreignId('taxonomy_id')->constrained()->onDelete('cascade');
             $table->string('name');
+            $table->string('slug');
             $table->timestamps();
+
+            $table->unique(['taxonomy_id', 'slug']); 
+        });
+
+        Schema::create('part_taxonomy_term', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('part_id')->constrained()->onDelete('cascade');
+            $table->foreignId('taxonomy_term_id')->constrained()->onDelete('cascade');
+            $table->unique(['part_id', 'taxonomy_term_id'], 'part_term_unique');
         });
     }
 
@@ -32,5 +42,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('taxonomies');
+        Schema::dropIfExists('taxonomy_terms');
+        Schema::dropIfExists('part_taxonomy_term');
     }
 };
