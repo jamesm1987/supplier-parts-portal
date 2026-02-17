@@ -48,110 +48,103 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
     const totalTaxonomies = taxonomies.length;
     const [taxonomyDialogOpen, setTaxonomyDialogOpen] = useState(false);
-    const [editingTaxonomy, setEditingTaxonomy] = useState<Taxonomy | null>(null);
     const [termDialogOpen, setTermDialogOpen] = useState(false);
-    const [editingTerm, setEditingTerm] = useState<{ taxonomyId: string; term: TaxonomyTerm } | null>(null);
-    const [termTaxonomyId, setTermTaxonomyId] = useState('');
+    const [editingTaxonomy, setEditingTaxonomy] = useState<Taxonomy | null>(null);
+    const [editingTerm, setEditingTerm] = useState<{ taxonomyId: number; term: TaxonomyTerm } | null>(null);
+    const [termTaxonomyId, setTermTaxonomyId] = useState<number | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<{ type: 'taxonomy' | 'term'; taxonomyId: string; termId?: string; name: string } | null>(null);
-
 
     const taxonomyForm = useForm({
         name: '',
     });
 
-
     const termForm = useForm({
         name: '',
+        taxonomy_id: '',
     });
 
 
-    const handleCreateTaxonomy = () => {
+    const openCreateTaxonomy = () => {
         setEditingTaxonomy(null);
+        taxonomyForm.reset();
         setTaxonomyDialogOpen(true);
     };
 
     const openEditTaxonomy = (taxonomy: Taxonomy) => {
         setEditingTaxonomy(taxonomy);
+        taxonomyForm.setData('name', taxonomy.name);
         setTaxonomyDialogOpen(true);
     };
 
     const handleSaveTaxonomy = () => {
         if (editingTaxonomy) {
-            taxonomyForm.put(TaxonomiesRoutes.update(editingTaxonomy.id), {
+            taxonomyForm.put(TaxonomiesRoutes.update(editingTaxonomy.id).url, {
                 onSuccess: () => {
-                    setTaxonomyDialogOpen(false);
-                    taxonomyForm.reset();
-                }
-            });
+                setTaxonomyDialogOpen(false);
+                taxonomyForm.reset();
+            }
+        });
+      
+        
         } else {
-            taxonomyForm.post(TaxonomiesRoutes.store(), {
-                onSuccess: () => {
-                    setTaxonomyDialogOpen(false);
-                    taxonomyForm.reset();
-                }
-            });
+        taxonomyForm.post(TaxonomiesRoutes.store().url, {
+            onSuccess: () => {
+            setTaxonomyDialogOpen(false);
+            taxonomyForm.reset();
+            },
+        });
         }
     };
 
-    const handleSaveTerm = () => {
-        if (editingTerm) {
-            termForm.put(TermsRoutes.update(editingTerm.id), {
-                onSuccess: () => {
-                    setTermDialogOpen(false);
-                    termForm.reset();
-                }
-            });
-        } else {
-            termForm.post(TermsRoutes.store(), {
-                onSuccess: () => {
-                    setTermDialogOpen(false);
-                    termForm.reset();
-                }
-            });
-        }
-    }; 
-
-
-    const handleCreateTerm = (taxonomyId: string) => {
+    // --- Term Logic ---
+    const openCreateTerm = (taxonomyId: string) => {
         setEditingTerm(null);
         setTermTaxonomyId(taxonomyId);
-        setTermName('');
+        termForm.reset();
+        termForm.setData('taxonomy_id', taxonomyId);
         setTermDialogOpen(true);
     };
 
-    const handleEditTerm = (taxonomyId: string, term: TaxonomyTerm) => {
+    const openEditTerm = (taxonomyId: string, term: TaxonomyTerm) => {
         setEditingTerm({ taxonomyId, term });
         setTermTaxonomyId(taxonomyId);
-        setTermName(term.name);
+        termForm.setData({
+            name: term.name,
+            taxonomy_id: taxonomyId
+        });
         setTermDialogOpen(true);
     };
 
     const handleSaveTerm = () => {
-        if (!termName.trim()) return;
-
         if (editingTerm) {
-            updateTerm(editingTerm.taxonomyId, editingTerm.term.id, {
-            name: termName.trim()
+        // Note: adjust route parameters based on your Ziggy/Laravel route definition
+        termForm.put(TermsRoutes.update(editingTerm.term.id), {
+            onSuccess: () => {
+            setTermDialogOpen(false);
+            termForm.reset();
+            },
         });
         } else {
-            addTerm(termTaxonomyId, termName.trim());
+        termForm.post(TermsRoutes.store(), {
+            onSuccess: () => {
+            setTermDialogOpen(false);
+            termForm.reset();
+            },
+        });
         }
-        setTermDialogOpen(false);
     };
 
     const handleDelete = () => {
         if (!deleteTarget) return;
-    
-        const { type, taxonomyId, termId } = deleteTarget;
 
-        if (type === 'taxonomy') {
-            taxonomyForm.delete(TaxonomiesRoutes.destroy(taxonomyId), {
-                onSuccess: () => setDeleteTarget(null)
-            });
-        } else {
-            termForm.delete(TermsRoutes.destroy([taxonomyId, termId]), {
-                onSuccess: () => setDeleteTarget(null)
-            });
+        if (deleteTarget.type === 'taxonomy') {
+        taxonomyForm.delete(TaxonomiesRoutes.destroy(deleteTarget.taxonomyId), {
+            onSuccess: () => setDeleteTarget(null),
+        });
+        } else if (deleteTarget.termId) {
+        termForm.delete(TermsRoutes.destroy(deleteTarget.termId), {
+            onSuccess: () => setDeleteTarget(null),
+        });
         }
     };
 

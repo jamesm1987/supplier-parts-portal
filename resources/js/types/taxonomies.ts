@@ -1,11 +1,11 @@
 export interface TaxonomyTerm {
-  id: string;
+  id: number;
   name: string;
   slug: string;
 }
 
 export interface Taxonomy {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   terms: TaxonomyTerm[];
