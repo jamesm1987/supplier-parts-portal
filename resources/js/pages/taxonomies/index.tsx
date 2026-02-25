@@ -64,6 +64,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
 
     const taxonomyForm = useForm({
         name: '',
+        slug: '',
     });
 
     const termForm = useForm({
@@ -81,6 +82,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
     const openEditTaxonomy = (taxonomy: Taxonomy) => {
         setEditingTaxonomy(taxonomy);
         taxonomyForm.setData('name', taxonomy.name);
+        taxonomyForm.setData('slug', taxonomy.slug);
         setTaxonomyDialogOpen(true);
     };
 
@@ -88,19 +90,17 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
         if (editingTaxonomy) {
             taxonomyForm.put(TaxonomiesRoutes.update(editingTaxonomy.id).url, {
                 onSuccess: () => {
-                setTaxonomyDialogOpen(false);
-                taxonomyForm.reset();
-            }
-        });
-      
-        
+                    setTaxonomyDialogOpen(false);
+                    taxonomyForm.reset();
+                }
+            });
         } else {
-        taxonomyForm.post(TaxonomiesRoutes.store().url, {
-            onSuccess: () => {
-            setTaxonomyDialogOpen(false);
-            taxonomyForm.reset();
-            },
-        });
+            taxonomyForm.post(TaxonomiesRoutes.store().url, {
+                onSuccess: () => {
+                    setTaxonomyDialogOpen(false);
+                    taxonomyForm.reset();
+                },
+            });
         }
     };
 
@@ -181,15 +181,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
             <Accordion type="multiple" defaultValue={taxonomies.map(t => String(t.id))} className="space-y-4">
                 {taxonomies.map((taxonomy) => (
                     <AccordionItem key={taxonomy.id} value={String(taxonomy.id)} className="border rounded-lg px-4">
-                        <AccordionTrigger className="hover:no-underline">
-                            <div className="flex items-center gap-3 flex-1 text-left">
-                            <Tags className="h-5 w-5 text-accent shrink-0" />
-                            <div className="flex-1 min-w-0">
-                                <span className="font-semibold">{taxonomy.name}</span>
-                            </div>
-                            <Badge variant="secondary" className="mr-2">{taxonomy.terms.length} terms</Badge>
-                            </div>
-                        </AccordionTrigger>
+                        
                         <AccordionContent>
                             <div className="pb-4 space-y-4">
                             <div className="flex items-center gap-2">
@@ -231,25 +223,25 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                                     </div>
                                     <div className="flex items-center gap-1">
                                         <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7"
-                                        onClick={() => openEditTerm(taxonomy.id, term)}
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-7 w-7"
+                                            onClick={() => openEditTerm(taxonomy.id, term)}
                                         >
-                                        <Pencil className="h-3 w-3" />
+                                            <Pencil className="h-3 w-3" />
                                         </Button>
                                         <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                                        onClick={() => setDeleteTarget({
-                                            type: 'term',
-                                            taxonomyId: taxonomy.id,
-                                            termId: term.id,
-                                            name: term.name,
-                                        })}
-                                        >
-                                        <Trash2 className="h-3 w-3" />
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                            onClick={() => setDeleteTarget({
+                                                type: 'term',
+                                                taxonomyId: taxonomy.id,
+                                                termId: term.id,
+                                                name: term.name,
+                                            })}
+                                            >
+                                            <Trash2 className="h-3 w-3" />
                                         </Button>
                                     </div>
                                     </div>
@@ -280,6 +272,17 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                             />
                             {taxonomyForm.errors.name && (
                                 <p className="text-sm text-destructive mt-1">{taxonomyForm.errors.name}</p>
+                            )}
+                        </div>
+                        <div>
+                            <Label className={taxonomyForm.errors.slug ? 'text-destructive' : ''}>Slug</Label>
+                            <Input
+                                value={taxonomyForm.data.slug} 
+                                onChange={e => taxonomyForm.setData('slug', e.target.value)}
+                                className={taxonomyForm.errors.slug ? 'border-destructive' : ''}
+                            />
+                            {taxonomyForm.errors.slug && (
+                                <p className="text-sm text-destructive mt-1">{taxonomyForm.errors.slug}</p>
                             )}
                         </div>
                     </div>
