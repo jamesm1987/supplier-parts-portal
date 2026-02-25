@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
+import { Form } from '@inertiajs/react';
 import { Supplier } from '@/types/suppliers';
 import AppLayout from '@/layouts/app-layout';
 import * as SupplierRoutes from '@/routes/suppliers';
@@ -35,7 +36,7 @@ export default function Index({ suppliers }: {suppliers: Supplier[]}) {
         setIsDialogOpen(true);
     };
 
-
+  
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Suppliers" />
@@ -67,6 +68,22 @@ export default function Index({ suppliers }: {suppliers: Supplier[]}) {
                                 >
                                 Edit
                                 </Button>
+
+                                <Form
+                                    action={SupplierRoutes.destroy(supplier.id).url}
+                                    method="delete"
+                                    options={{ preserveScroll: true }}
+                                >
+                                    {({ processing }) => (
+                                        <Button 
+                                            variant="destructive" 
+                                            disabled={processing} 
+                                            type="submit"
+                                        >
+                                            {processing ? 'Deleting...' : 'Delete'}
+                                        </Button>
+                                    )}
+                                </Form>
                             </TableCell>
                             </TableRow>
                         ))

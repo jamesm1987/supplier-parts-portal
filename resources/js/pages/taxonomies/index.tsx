@@ -1,23 +1,13 @@
 import { Head } from '@inertiajs/react';
-import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { Taxonomy, TaxonomyTerm } from '@/types/taxonomies';
-import * as TaxonomiesRoutes from '@/routes/taxonomies';
-import * as TermsRoutes from '@/routes/taxonomies/terms';
-import type { BreadcrumbItem } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Plus, Pencil, Trash2, Tags, FolderTree, X } from 'lucide-react';
+import { useState } from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,14 +18,32 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import { Plus, Pencil, Trash2, Tags, FolderTree, X } from 'lucide-react';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+
+import AppLayout from '@/layouts/app-layout';
+
+import * as TaxonomiesRoutes from '@/routes/taxonomies';
+import * as TermsRoutes from '@/routes/taxonomies/terms';
+import type { BreadcrumbItem } from '@/types';
+import type { Taxonomy, TaxonomyTerm } from '@/types/taxonomies';
+
+
+
+
+
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -52,7 +60,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
     const [editingTaxonomy, setEditingTaxonomy] = useState<Taxonomy | null>(null);
     const [editingTerm, setEditingTerm] = useState<{ taxonomyId: number; term: TaxonomyTerm } | null>(null);
     const [termTaxonomyId, setTermTaxonomyId] = useState<number | null>(null);
-    const [deleteTarget, setDeleteTarget] = useState<{ type: 'taxonomy' | 'term'; taxonomyId: string; termId?: string; name: string } | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<{ type: 'taxonomy' | 'term'; taxonomyId: number; termId?: number; name: string } | null>(null);
 
     const taxonomyForm = useForm({
         name: '',
@@ -97,7 +105,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
     };
 
     // --- Term Logic ---
-    const openCreateTerm = (taxonomyId: string) => {
+    const openCreateTerm = (taxonomyId: number) => {
         setEditingTerm(null);
         setTermTaxonomyId(taxonomyId);
         termForm.reset();
@@ -105,7 +113,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
         setTermDialogOpen(true);
     };
 
-    const openEditTerm = (taxonomyId: string, term: TaxonomyTerm) => {
+    const openEditTerm = (taxonomyId: number, term: TaxonomyTerm) => {
         setEditingTerm({ taxonomyId, term });
         setTermTaxonomyId(taxonomyId);
         termForm.setData({
@@ -117,15 +125,14 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
 
     const handleSaveTerm = () => {
         if (editingTerm) {
-        // Note: adjust route parameters based on your Ziggy/Laravel route definition
-        termForm.put(TermsRoutes.update(editingTerm.term.id), {
+        termForm.put(TermsRoutes.update(editingTerm.term.id).url(), {
             onSuccess: () => {
             setTermDialogOpen(false);
             termForm.reset();
             },
         });
         } else {
-        termForm.post(TermsRoutes.store(), {
+        termForm.post(TermsRoutes.store().url, {
             onSuccess: () => {
             setTermDialogOpen(false);
             termForm.reset();
@@ -138,13 +145,14 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
         if (!deleteTarget) return;
 
         if (deleteTarget.type === 'taxonomy') {
-        taxonomyForm.delete(TaxonomiesRoutes.destroy(deleteTarget.taxonomyId), {
-            onSuccess: () => setDeleteTarget(null),
-        });
+            // Use the form instance method
+            taxonomyForm.delete(TaxonomiesRoutes.destroy(deleteTarget.taxonomyId).url(), {
+                onSuccess: () => setDeleteTarget(null),
+            });
         } else if (deleteTarget.termId) {
-        termForm.delete(TermsRoutes.destroy(deleteTarget.termId), {
-            onSuccess: () => setDeleteTarget(null),
-        });
+            termForm.delete(TermsRoutes.destroy(deleteTarget.termId).url(), {
+                onSuccess: () => setDeleteTarget(null),
+            });
         }
     };
 
@@ -156,7 +164,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
             <div className="flex items-center justify-end">
 
 
-                <Button onClick={handleCreate}>
+                <Button onClick={openCreateTaxonomy}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Taxonomy
                 </Button>
@@ -170,9 +178,9 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                     </CardContent>
                 </Card>
             ) : (
-            <Accordion type="multiple" defaultValue={taxonomies.map(t => t.id)} className="space-y-4">
+            <Accordion type="multiple" defaultValue={taxonomies.map(t => String(t.id))} className="space-y-4">
                 {taxonomies.map((taxonomy) => (
-                    <AccordionItem key={taxonomy.id} value={taxonomy.id} className="border rounded-lg px-4">
+                    <AccordionItem key={taxonomy.id} value={String(taxonomy.id)} className="border rounded-lg px-4">
                         <AccordionTrigger className="hover:no-underline">
                             <div className="flex items-center gap-3 flex-1 text-left">
                             <Tags className="h-5 w-5 text-accent shrink-0" />
@@ -185,7 +193,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                         <AccordionContent>
                             <div className="pb-4 space-y-4">
                             <div className="flex items-center gap-2">
-                                <Button size="sm" variant="outline" onClick={() => openAddTerm(taxonomy.id)}>
+                                <Button size="sm" variant="outline" onClick={() => openCreateTerm(taxonomy.id)}>
                                 <Plus className="h-3 w-3 mr-1" />
                                 Add Term
                                 </Button>
@@ -263,17 +271,21 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                     </DialogHeader>
                     <div className="space-y-4">
                         <div>
-                        <Label>Name *</Label>
-                        <Input
-                            value={taxonomyName}
-                            onChange={e => setTaxonomyName(e.target.value)}
-                            placeholder="e.g., Brand, Category, Material"
-                        />
+                            <Label className={taxonomyForm.errors.name ? 'text-destructive' : ''}>Name *</Label>
+                            <Input
+                                value={taxonomyForm.data.name} 
+                                onChange={e => taxonomyForm.setData('name', e.target.value)}
+                                className={taxonomyForm.errors.name ? 'border-destructive' : ''}
+                                placeholder="e.g., Brand, Category, Material"
+                            />
+                            {taxonomyForm.errors.name && (
+                                <p className="text-sm text-destructive mt-1">{taxonomyForm.errors.name}</p>
+                            )}
                         </div>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setTaxonomyDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleSaveTaxonomy} disabled={!taxonomyName.trim()}>
+                        <Button onClick={handleSaveTaxonomy} disabled={!taxonomyForm.data.name.trim()}>
                         {editingTaxonomy ? 'Update' : 'Create'}
                         </Button>
                     </DialogFooter>
@@ -288,17 +300,21 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                     </DialogHeader>
                     <div className="space-y-4">
                         <div>
-                        <Label>Name *</Label>
-                        <Input
-                            value={termName}
-                            onChange={e => setTermName(e.target.value)}
-                            placeholder="e.g., Timken, Bearings"
-                        />
+                            <Label className={termForm.errors.name ? 'text-destructive' : ''}>Name *</Label>
+                            <Input
+                                value={termForm.data.name} 
+                                onChange={e => termForm.setData('name', e.target.value)}
+                                className={termForm.errors.name ? 'border-destructive' : ''}
+                                placeholder="e.g., Timken, Bearings"
+                            />
+                            {termForm.errors.name && (
+                                <p className="text-sm text-destructive mt-1">{termForm.errors.name}</p>
+                            )}
                         </div>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setTermDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleSaveTerm} disabled={!termName.trim()}>
+                        <Button onClick={handleSaveTerm} disabled={!termForm.data.name.trim()}>
                         {editingTerm ? 'Update' : 'Add'}
                         </Button>
                     </DialogFooter>
