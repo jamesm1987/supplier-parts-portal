@@ -28,4 +28,5 @@ class Part extends Model
     {
         return $this->belongsToMany(TaxonomyTerm::class);
     }
+
 }
