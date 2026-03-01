@@ -8,7 +8,7 @@ use Inertia\Inertia;
 use App\Models\{Taxonomy, TaxonomyTerm};
 use Illuminate\Support\Facades\Redirect;
 
-class TermController extends Controller
+class TaxonomyTermController extends Controller
 {
     /**
      * Store a newly created resource in storage.
@@ -37,6 +37,12 @@ class TermController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $term = TaxonomyTerm::where('id', $id)->get();
+
+        $term = TaxonomyTerm::findOrFail($id);
+        $term->delete();
+
+        return back()->with('success', 'Term deleted.');
+
     }
 }

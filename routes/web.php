@@ -5,7 +5,9 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TaxonomyController;
-use App\Http\Controllers\TermController;
+use App\Http\Controllers\TaxonomyTermController;
+use App\Http\Controllers\AttributeController;
+use App\Http\Controllers\PartController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -19,6 +21,8 @@ Route::get('dashboard', function () {
 
 Route::resource('suppliers', SupplierController::class);
 Route::resource('taxonomies', TaxonomyController::class);
-Route::resource('taxonomies.terms', TermController::class)->shallow();
+Route::resource('taxonomies.terms', TaxonomyTermController::class);
+Route::resource('attributes', AttributeController::class);
+Route::resource('parts', PartController::class);
 
 require __DIR__.'/settings.php';

@@ -11,4 +11,9 @@ class Taxonomy extends Model
         'name',
         'slug',
     ];
+
+    public function terms() 
+    {
+        return $this->hasMany(TaxonomyTerm::class);
+    }
 }

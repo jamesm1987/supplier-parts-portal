@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\StoreTaxonomyRequest;
+use App\Http\Requests\StoreAttributeRequest;
 use Inertia\Inertia;
-use App\Models\{Taxonomy, TaxonomyTerm};
+use App\Models\Attribute;
 
-class TaxonomyController extends Controller
+class AttributeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $taxonomies = Taxonomy::with('terms')->get();
-        return Inertia::render('taxonomies/index', ['taxonomies' => $taxonomies]);
+        $attributes = Attribute::all();
+        return Inertia::render('attributes/index', ['attributes' => $attributes]);
     }
 
     /**
@@ -29,11 +29,11 @@ class TaxonomyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTaxonomyRequest $request)
+    public function store(StoreAttributeRequest $request)
     {
-        Taxonomy::create($request->validated());
+        Attribute::create($request->validated());
 
-        return back()->with('success', 'Taxonomy created.');
+        return back()->with('success', 'Attribute created.');
     }
 
     /**
@@ -55,11 +55,11 @@ class TaxonomyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreTaxonomyRequest $request, Taxonomy $taxonomy)
+    public function update(StoreAttributeRequest $request, Attribute $attribute)
     {
-        $taxonomy->update($request->validated());
+        $attribute->update($request->validated());
 
-        return back()->with('success', 'Taxonomy updated.');
+        return back()->with('success', 'Attribute updated.');
     }
 
     /**

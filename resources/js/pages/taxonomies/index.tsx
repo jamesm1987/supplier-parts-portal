@@ -58,9 +58,15 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
     const [taxonomyDialogOpen, setTaxonomyDialogOpen] = useState(false);
     const [termDialogOpen, setTermDialogOpen] = useState(false);
     const [editingTaxonomy, setEditingTaxonomy] = useState<Taxonomy | null>(null);
-    const [editingTerm, setEditingTerm] = useState<{ taxonomyId: number; term: TaxonomyTerm } | null>(null);
-    const [termTaxonomyId, setTermTaxonomyId] = useState<number | null>(null);
-    const [deleteTarget, setDeleteTarget] = useState<{ type: 'taxonomy' | 'term'; taxonomyId: number; termId?: number; name: string } | null>(null);
+    const [editingTerm, setEditingTerm] = useState<{ taxonomy_id: number; term: TaxonomyTerm } | null>(null);
+    const [termTaxonomyId, setTermTaxonomyId] = useState<number | null>(null)
+    const [deleteTarget, setDeleteTarget] = useState<{ 
+        type: 'taxonomy' | 'term'; 
+        taxonomy_id: number; 
+        termId?: number; 
+        name: string 
+    } | null>(null);
+
 
     const taxonomyForm = useForm({
         name: '',
@@ -69,7 +75,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
 
     const termForm = useForm({
         name: '',
-        taxonomy_id: '',
+        taxonomy_id: null as number | null,
     });
 
 
@@ -105,34 +111,34 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
     };
 
     // --- Term Logic ---
-    const openCreateTerm = (taxonomyId: number) => {
+    const openCreateTerm = (taxonomy_id: number) => {
         setEditingTerm(null);
-        setTermTaxonomyId(taxonomyId);
+        setTermTaxonomyId(taxonomy_id);
         termForm.reset();
-        termForm.setData('taxonomy_id', taxonomyId);
+        termForm.setData('taxonomy_id', taxonomy_id);
         setTermDialogOpen(true);
     };
 
-    const openEditTerm = (taxonomyId: number, term: TaxonomyTerm) => {
-        setEditingTerm({ taxonomyId, term });
-        setTermTaxonomyId(taxonomyId);
+    const openEditTerm = (taxonomy_id: number, term: TaxonomyTerm) => {
+        setEditingTerm({ taxonomy_id, term });
+        setTermTaxonomyId(taxonomy_id);
         termForm.setData({
             name: term.name,
-            taxonomy_id: taxonomyId
+            taxonomy_id: taxonomy_id
         });
         setTermDialogOpen(true);
     };
 
     const handleSaveTerm = () => {
         if (editingTerm) {
-        termForm.put(TermsRoutes.update(editingTerm.term.id).url(), {
+        termForm.put(TermsRoutes.update([editingTerm.taxonomy_id, editingTerm.term.id]).url, {
             onSuccess: () => {
             setTermDialogOpen(false);
             termForm.reset();
             },
         });
         } else {
-        termForm.post(TermsRoutes.store().url, {
+        termForm.post(TermsRoutes.store(termForm.data.taxonomy_id!).url, {
             onSuccess: () => {
             setTermDialogOpen(false);
             termForm.reset();
@@ -145,12 +151,12 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
         if (!deleteTarget) return;
 
         if (deleteTarget.type === 'taxonomy') {
-            // Use the form instance method
-            taxonomyForm.delete(TaxonomiesRoutes.destroy(deleteTarget.taxonomyId).url(), {
+
+            taxonomyForm.delete(TaxonomiesRoutes.destroy(deleteTarget.taxonomy_id).url, {
                 onSuccess: () => setDeleteTarget(null),
             });
         } else if (deleteTarget.termId) {
-            termForm.delete(TermsRoutes.destroy(deleteTarget.termId).url(), {
+            termForm.delete(TermsRoutes.destroy([deleteTarget.taxonomy_id, deleteTarget.termId]).url, {
                 onSuccess: () => setDeleteTarget(null),
             });
         }
@@ -181,7 +187,15 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
             <Accordion type="multiple" defaultValue={taxonomies.map(t => String(t.id))} className="space-y-4">
                 {taxonomies.map((taxonomy) => (
                     <AccordionItem key={taxonomy.id} value={String(taxonomy.id)} className="border rounded-lg px-4">
-                        
+                        <AccordionTrigger className="hover:no-underline">
+                            <div className="flex items-center gap-3 flex-1 text-left">
+                            <Tags className="h-5 w-5 text-accent shrink-0" />
+                            <div className="flex-1 min-w-0">
+                                <span className="font-semibold">{taxonomy.name}</span>
+                            </div>
+                            <Badge variant="secondary" className="mr-2">{taxonomy.terms.length} terms</Badge>
+                            </div>
+                        </AccordionTrigger>
                         <AccordionContent>
                             <div className="pb-4 space-y-4">
                             <div className="flex items-center gap-2">
@@ -197,7 +211,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                                 size="sm"
                                 variant="ghost"
                                 className="text-destructive hover:text-destructive"
-                                onClick={() => setDeleteTarget({ type: 'taxonomy', taxonomyId: taxonomy.id, name: taxonomy.name })}
+                                onClick={() => setDeleteTarget({ type: 'taxonomy', taxonomy_id: taxonomy.id, name: taxonomy.name })}
                                 >
                                 <Trash2 className="h-3 w-3 mr-1" />
                                 Delete
@@ -236,7 +250,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                                             className="h-7 w-7 text-muted-foreground hover:text-destructive"
                                             onClick={() => setDeleteTarget({
                                                 type: 'term',
-                                                taxonomyId: taxonomy.id,
+                                                taxonomy_id: taxonomy.id,
                                                 termId: term.id,
                                                 name: term.name,
                                             })}
@@ -263,11 +277,11 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                     </DialogHeader>
                     <div className="space-y-4">
                         <div>
-                            <Label className={taxonomyForm.errors.name ? 'text-destructive' : ''}>Name *</Label>
+                            <Label className={taxonomyForm.errors.name ? 'text-destructive' : 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'}>Name *</Label>
                             <Input
                                 value={taxonomyForm.data.name} 
                                 onChange={e => taxonomyForm.setData('name', e.target.value)}
-                                className={taxonomyForm.errors.name ? 'border-destructive' : ''}
+                                className={taxonomyForm.errors.name ? 'border-destructive' : 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'}
                                 placeholder="e.g., Brand, Category, Material"
                             />
                             {taxonomyForm.errors.name && (
@@ -275,11 +289,11 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                             )}
                         </div>
                         <div>
-                            <Label className={taxonomyForm.errors.slug ? 'text-destructive' : ''}>Slug</Label>
+                            <Label className={taxonomyForm.errors.slug ? 'text-destructive' : 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'}>Slug</Label>
                             <Input
                                 value={taxonomyForm.data.slug} 
                                 onChange={e => taxonomyForm.setData('slug', e.target.value)}
-                                className={taxonomyForm.errors.slug ? 'border-destructive' : ''}
+                                className={taxonomyForm.errors.slug ? 'border-destructive' : 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'}
                             />
                             {taxonomyForm.errors.slug && (
                                 <p className="text-sm text-destructive mt-1">{taxonomyForm.errors.slug}</p>
@@ -337,7 +351,7 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 text-white">
                         Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
