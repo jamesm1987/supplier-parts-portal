@@ -110,7 +110,6 @@ export default function Index({ taxonomies }: {taxonomies: Taxonomy[]}) {
         }
     };
 
-    // --- Term Logic ---
     const openCreateTerm = (taxonomy_id: number) => {
         setEditingTerm(null);
         setTermTaxonomyId(taxonomy_id);

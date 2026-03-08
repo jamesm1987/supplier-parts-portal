@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from '@/components/ui/input';
+import { Textarea } from "@/components/ui/textarea"
 import { Button } from '@/components/ui/button';
 
 import { 
@@ -104,7 +105,7 @@ export const PartFormDialog = ({part, taxonomies, open, onOpenChange }: PartForm
               <FormItem>
                 <FormLabel className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" error={!!errors.sku}>SKU *</FormLabel>
                 <FormControl>
-                  <input
+                  <Input
                     value={data.sku}
                     onChange={e => setData('sku', e.target.value)}
                     className={errors.sku ? 'border-destructive' : 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'}
@@ -116,7 +117,7 @@ export const PartFormDialog = ({part, taxonomies, open, onOpenChange }: PartForm
               <FormItem>
                 <FormLabel className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"error={!!errors.description}>Description *</FormLabel>
                 <FormControl>
-                  <input
+                  <Input
                     value={data.description}
                     onChange={e => setData('description', e.target.value)}
                     className={errors.description ? 'border-destructive' : 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'}
@@ -153,10 +154,10 @@ export const PartFormDialog = ({part, taxonomies, open, onOpenChange }: PartForm
               <FormItem>
                 <FormLabel className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" error={!!errors.contents}>Contents</FormLabel>
                 <FormControl>
-                  <input
+                  <Textarea
                     value={data.contents}
                     onChange={e => setData('contents', e.target.value)}
-                    className={errors.contents ? 'border-destructive' : 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'}
+                    className={errors.contents ? 'border-destructive' : 'flex h-[10rem] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm'}
                   />
                 </FormControl>
                 <FormMessage error={errors.contents}/>

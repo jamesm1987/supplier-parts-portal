@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePartRequest;
 use Inertia\Inertia;
-use App\Models\{Taxonomy, Part};
+use App\Models\{Taxonomy, Part, Supplier};
 
 class PartController extends Controller
 {
@@ -16,10 +16,12 @@ class PartController extends Controller
     {
         $parts = Part::with('taxonomyTerms')->get();
         $taxonomies = Taxonomy::with('terms')->get();
+        $suppliers = Supplier::all();
         
         return Inertia::render('parts/index', [
             'parts' => $parts,
-            'taxonomies' => $taxonomies
+            'taxonomies' => $taxonomies,
+            'suppliers' => $suppliers,
         ]);
     }
 

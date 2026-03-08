@@ -8,9 +8,8 @@ import type { BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { AttributeFormDialog } from '@/components/attribute-form-dialog';
 
-import { 
-  Table, TableHeader, TableBody, TableHead, TableRow, TableCell 
-} from "@/components/ui/table";
+import { DataTable } from "@/components/data-table";
+import { getColumns } from "@/components/attributes/attributes-columns";
 
 import { Plus } from 'lucide-react';
 
@@ -37,7 +36,8 @@ export default function Index({ attributes }: {attributes: Attribute[]}) {
         setIsDialogOpen(true);
     };
 
-  
+    const columns = getColumns(handleEdit);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Attributes" />
@@ -49,55 +49,7 @@ export default function Index({ attributes }: {attributes: Attribute[]}) {
                 </Button>
             </div>
 
-            <div className="border rounded-md">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                        <TableHead>Label</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {attributes.length > 0 ? (
-                        attributes.map((attribute) => (
-                            <TableRow key={attribute.id}>
-                            <TableCell className="font-medium">{attribute.label}</TableCell>
-                            <TableCell className="text-right">
-                                <Button 
-                                variant="ghost" 
-                                onClick={() => handleEdit(attribute)}
-                                >
-                                Edit
-                                </Button>
-
-                                <Form
-                                    action={AttributeRoutes.destroy(attribute.id).url}
-                                    method="delete"
-                                    options={{ preserveScroll: true }}
-                                >
-                                    {({ processing }) => (
-                                        <Button 
-                                            variant="destructive" 
-                                            disabled={processing} 
-                                            type="submit"
-                                        >
-                                            {processing ? 'Deleting...' : 'Delete'}
-                                        </Button>
-                                    )}
-                                </Form>
-                            </TableCell>
-                            </TableRow>
-                        ))
-                        ) : (
-                        <TableRow>
-                            <TableCell colSpan={4} className="h-24 text-center">
-                            No attributes found.
-                            </TableCell>
-                        </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+            <DataTable columns={columns} data={attributes} resourceName="attributes"/>
 
             <AttributeFormDialog 
                 attribute={selectedAttribute} 

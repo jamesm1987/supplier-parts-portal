@@ -29,4 +29,9 @@ class Part extends Model
         return $this->belongsToMany(TaxonomyTerm::class);
     }
 
+    public function crossReferences()
+    {
+        return $this->hasMany(CrossReference::class);
+    }
+
 }

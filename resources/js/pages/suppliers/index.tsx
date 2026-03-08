@@ -7,9 +7,9 @@ import * as SupplierRoutes from '@/routes/suppliers';
 import type { BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { SupplierFormDialog } from '@/components/supplier-form-dialog';
-import { 
-  Table, TableHeader, TableBody, TableHead, TableRow, TableCell 
-} from "@/components/ui/table";
+
+import { DataTable } from "@/components/data-table";
+import { getColumns } from "@/components/suppliers/suppliers-columns";
 
 import { Plus } from 'lucide-react';
 
@@ -36,6 +36,7 @@ export default function Index({ suppliers }: {suppliers: Supplier[]}) {
         setIsDialogOpen(true);
     };
 
+    const columns = getColumns(handleEdit);
   
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -48,55 +49,7 @@ export default function Index({ suppliers }: {suppliers: Supplier[]}) {
                 </Button>
             </div>
 
-            <div className="border rounded-md">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {suppliers.length > 0 ? (
-                        suppliers.map((supplier) => (
-                            <TableRow key={supplier.id}>
-                            <TableCell className="font-medium">{supplier.name}</TableCell>
-                            <TableCell className="text-right">
-                                <Button 
-                                variant="ghost" 
-                                onClick={() => handleEdit(supplier)}
-                                >
-                                Edit
-                                </Button>
-
-                                <Form
-                                    action={SupplierRoutes.destroy(supplier.id).url}
-                                    method="delete"
-                                    options={{ preserveScroll: true }}
-                                >
-                                    {({ processing }) => (
-                                        <Button 
-                                            variant="destructive" 
-                                            disabled={processing} 
-                                            type="submit"
-                                        >
-                                            {processing ? 'Deleting...' : 'Delete'}
-                                        </Button>
-                                    )}
-                                </Form>
-                            </TableCell>
-                            </TableRow>
-                        ))
-                        ) : (
-                        <TableRow>
-                            <TableCell colSpan={4} className="h-24 text-center">
-                            No suppliers found.
-                            </TableCell>
-                        </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+            <DataTable columns= {columns} data={suppliers} resourceName="suppliers" />
 
             <SupplierFormDialog 
                 supplier={selectedSupplier} 
