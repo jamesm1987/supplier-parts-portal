@@ -1,18 +1,10 @@
-import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
-import { useState } from 'react';
-import { Part, CrossReference } from '@/types/parts';
-import { Supplier } from '@/types/suppliers';
-import * as PartRoutes from "@/routes/parts";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
+import { Plus, X, Link2 } from 'lucide-react';
+import { useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Button } from '@/components/ui/button';
+
+import { FormItem, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from '@/components/ui/input';
 import { 
   Select, 
@@ -22,7 +14,16 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Separator } from '@/components/ui/separator';
-import { Plus, X, Link2 } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+
+import * as PartRoutes from "@/routes/parts";
+import type { Part, CrossReference } from '@/types/parts';
+import type { Supplier } from '@/types/suppliers';
 
 interface CrossRefManagerProps {
   part: Part | null | undefined;
@@ -33,29 +34,22 @@ interface CrossRefManagerProps {
 
 export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRefManagerProps) => {
 
+const { data, setData, post, errors, reset, clearErrors } = useForm({
+    part_id: '',
+    supplier_id: '',
+    part_number: ''
+  });
+
+  useEffect(() => {
+    if (open && part) {
+      setData('part_id', part.id.toString());
+    } else if (!open) {
+      reset();
+      clearErrors();
+    }
+  }, [open, part, setData, reset, clearErrors]);
+
   if (!part) return null;
-
-   const {data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
-        part_id: part?.id ?? '',
-        supplier_id: '',
-        part_number: ''
-   })
-
-  const crossRefs = part.crossReferences ?? [];
-
-    useEffect(() => {
-      if (open && part) {
-        
-        
-          setData('part_id', part.id);
-        
-        } else if(!open){
-        
-          reset();
-          clearErrors();
-        
-      }
-    }, [open, part]);
 
   const handleAdd = () => {
 
@@ -67,7 +61,7 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
     }
   };
 
-  post(PartRoutes.parts.cross-crossReferences.store().url, 1, 2);
+  post(PartRoutes.crossReferences.store.url());
 
 //   const handleRemove = (index: number) => {
 //     const updated = crossRefs.filter((_, i) => i !== index);
