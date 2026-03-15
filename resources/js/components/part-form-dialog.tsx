@@ -1,8 +1,6 @@
-import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
-import { Part } from '@/types/parts';
-import { Taxonomy } from '@/types/taxonomies';
-import * as PartRoutes from '@/routes/parts';
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog, 
   DialogContent,
@@ -11,9 +9,6 @@ import {
 } from '@/components/ui/dialog';
 import { FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from '@/components/ui/input';
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from '@/components/ui/button';
-
 import { 
   Select, 
   SelectContent, 
@@ -21,6 +16,11 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea"
+import * as PartRoutes from '@/routes/parts';
+import type { Part } from '@/types/parts';
+import type { Taxonomy } from '@/types/taxonomies';
+
 
 
 interface PartFormDialogProps {

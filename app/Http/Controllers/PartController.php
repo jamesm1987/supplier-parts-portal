@@ -14,10 +14,27 @@ class PartController extends Controller
      */
     public function index()
     {
-        $parts = Part::with('taxonomyTerms')->get();
+        $parts = Part::with(['taxonomyTerms', 'crossReferences.supplier'])->get()->map(function ($part) {
+            return [
+                'id' => $part->id,
+                'sku' => $part->sku,
+                'description' => $part->description,
+                'contents' => $part->contents,
+                'taxonomy_terms' => $part->taxonomyTerms,
+                'crossReferences' => $part->crossReferences->latest()->map(function ($crossRef) {
+                    return [
+                        'id' => $crossRef->id,
+                        'part_number' => $crossRef->part_number,
+                        'supplier' => $crossRef->supplier,
+                        'supplier_id' => $crossRef->supplier_id,
+                        'superseded_by' => $crossRef->superseded_by,
+                    ];
+                }),
+            ];
+        });
         $taxonomies = Taxonomy::with('terms')->get();
         $suppliers = Supplier::all();
-        
+
         return Inertia::render('parts/index', [
             'parts' => $parts,
             'taxonomies' => $taxonomies,

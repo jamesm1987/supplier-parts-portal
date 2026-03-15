@@ -1,8 +1,7 @@
 
 "use client"
 
-import { Part } from '@/types/parts';
-import { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Pencil, Trash2, GitCompare, MoreHorizontal, FileText } from "lucide-react";
 
 
@@ -15,6 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { Part } from '@/types/parts';
 
 export const getColumns = (onEdit: (part: Part) => void, onManageCrossRefs: (part: Part) => void) => { 
     const columns: ColumnDef<Part>[] = [
@@ -23,8 +23,17 @@ export const getColumns = (onEdit: (part: Part) => void, onManageCrossRefs: (par
             header: "SKU",
         },
         {
-            accessorKey: "crossrefs",
             header: "Cross Refs",
+            cell: ({ row }) => {
+                const crossRefs = row.original.crossReferences || row.original.crossReferences;
+
+                if (!crossRefs) return 0;
+                // Handle array
+                if (Array.isArray(crossRefs)) {
+                    return crossRefs.length;
+                }
+                return 0;
+            },
         },
         {
             accessorKey: "oerefs",

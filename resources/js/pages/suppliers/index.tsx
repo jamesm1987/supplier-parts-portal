@@ -1,17 +1,17 @@
 import { Head } from '@inertiajs/react';
-import { useState } from 'react';
 import { Form } from '@inertiajs/react';
-import { Supplier } from '@/types/suppliers';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import { DataTable } from "@/components/data-table";
+import { SupplierFormDialog } from '@/components/supplier-form-dialog';
+import { getColumns } from "@/components/suppliers/suppliers-columns";
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import * as SupplierRoutes from '@/routes/suppliers';
 import type { BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
-import { SupplierFormDialog } from '@/components/supplier-form-dialog';
 
-import { DataTable } from "@/components/data-table";
-import { getColumns } from "@/components/suppliers/suppliers-columns";
+import type { Supplier } from '@/types/suppliers';
 
-import { Plus } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

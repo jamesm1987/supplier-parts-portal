@@ -1,5 +1,5 @@
 import { router, usePage } from '@inertiajs/react';
-import { Supplier } from '@/types/suppliers';
+import type { Supplier } from '@/types/suppliers';
 
 export const useSuppliersData = () => {
     

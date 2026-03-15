@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
-import { Supplier } from '@/types/suppliers';
-import * as SupplierRoutes from '@/routes/suppliers';
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog, 
   DialogContent,
@@ -10,7 +9,8 @@ import {
 } from '@/components/ui/dialog';
 import { FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import * as SupplierRoutes from '@/routes/suppliers';
+import type { Supplier } from '@/types/suppliers';
 
 
 interface SupplierFormDialogProps {

@@ -23,9 +23,11 @@ class StorePartCrossReferenceRequest extends FormRequest
     public function rules(): array
     {
 
-        $partId = $this->route('part')?->id;
-
         return [
+            'part_id' => ['required', 'exists:parts,id'],
+            'supplier_id' => ['required', 'exists:suppliers,id'],
+            'part_number' => ['required', 'string', 'max:255'],
+            'superseded_by' => ['nullable', 'exists:cross_reference_parts,id'],
         ];
     }
 }

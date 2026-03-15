@@ -1,20 +1,20 @@
 import { Head } from '@inertiajs/react';
-import { useState } from 'react';
 import { Form } from '@inertiajs/react';
-import { Part } from '@/types/parts';
-import { Taxonomy } from '@/types/taxonomies';
-import { Supplier } from '@/types/suppliers';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import { CrossRefEditor } from '@/components/cross-ref-editor';
+import { DataTable } from "@/components/data-table";
+import { PartFormDialog } from '@/components/part-form-dialog';
+import { getColumns } from "@/components/parts/parts-columns";
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import * as PartRoutes from '@/routes/parts';
 import type { BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
-import { DataTable } from "@/components/data-table";
-import { getColumns } from "@/components/parts/parts-columns";
+import type { Part } from '@/types/parts';
+import { Supplier } from '@/types/suppliers';
+import { Taxonomy } from '@/types/taxonomies';
 
-import { PartFormDialog } from '@/components/part-form-dialog';
-import { CrossRefEditor } from '@/components/cross-ref-editor';
 
-import { Plus } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

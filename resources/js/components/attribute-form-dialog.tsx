@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
-import { Attribute } from '@/types/attributes';
-import * as AttributeRoutes from '@/routes/attributes';
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog, 
   DialogContent,
@@ -9,6 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Input } from '@/components/ui/input';
 import { 
   Select, 
   SelectContent, 
@@ -16,8 +16,8 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import * as AttributeRoutes from '@/routes/attributes';
+import type { Attribute } from '@/types/attributes';
 
 
 interface AttributeFormDialogProps {

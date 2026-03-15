@@ -1,8 +1,7 @@
 
 "use client"
 
-import { Attribute } from '@/types/attributes';
-import { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 
@@ -14,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { Attribute } from '@/types/attributes';
 
 export const getColumns = (onEdit: (attribute: Attribute) => void) => { 
     const columns: ColumnDef<Attribute>[] = [

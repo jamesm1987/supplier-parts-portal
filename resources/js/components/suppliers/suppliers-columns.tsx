@@ -1,8 +1,7 @@
 
 "use client"
 
-import { Supplier } from '@/types/suppliers';
-import { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Pencil, Trash2, GitCompare, MoreHorizontal, FileText } from "lucide-react";
 
 
@@ -15,6 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { Supplier } from '@/types/suppliers';
 
 export const getColumns = (onEdit: (supplier: Supplier) => void) => { 
     const columns: ColumnDef<Supplier>[] = [

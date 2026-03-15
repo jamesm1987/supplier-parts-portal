@@ -1,9 +1,13 @@
 import type { TaxonomyTerm } from './taxonomies';
-
+import type { Supplier } from './suppliers';
 
 export type CrossReference = {
-  supplier: string;
-  partNumber: string;
+  id: number;
+  part_number: string;
+  supplier: Supplier;
+  supplier_id: number;
+  superseded_by?: number | null;
+  superseded_part?: number | null;
 }
 
 export type Part = {

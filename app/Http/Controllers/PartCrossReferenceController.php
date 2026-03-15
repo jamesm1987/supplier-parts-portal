@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePartCrossReferenceRequest;
 use Inertia\Inertia;
-use App\Models\{Taxonomy, Part, Supplier};
+use App\Models\{Taxonomy, Part, Supplier, CrossReference};
 
 class PartCrossReferenceController extends Controller
 {
@@ -15,10 +15,15 @@ class PartCrossReferenceController extends Controller
      */
     public function store(StorePartCrossReferenceRequest $request)
     {
+        $crossReference = CrossReference::create($request->except('superseded_by'));
 
-        // $part = Part::create($request->validated());
-
-
+        if ($request->filled('superseded_part')) {
+            $superseded = CrossReference::find($request->superseded_part);
+            if ($superseded) {
+                $superseded->update(['superseded_by' => $crossReference->id]);
+            }
+        }
+        
         return back()->with('success', 'Cross Reference added.');
     }
 

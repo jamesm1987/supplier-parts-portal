@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
-import { Taxonomy } from '@/types/taxonomies';
-import * as TaxonomiesRoutes from '@/routes/taxonomies';
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog, 
   DialogContent,
@@ -10,8 +9,9 @@ import {
 } from '@/components/ui/dialog';
 import { FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { slugify } from '@/lib/utils';
+import * as TaxonomiesRoutes from '@/routes/taxonomies';
+import type { Taxonomy } from '@/types/taxonomies';
 
 
 interface TaxonomyFormDialogProps {
