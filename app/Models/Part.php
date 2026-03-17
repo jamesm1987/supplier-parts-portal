@@ -34,4 +34,9 @@ class Part extends Model
         return $this->hasMany(CrossReference::class);
     }
 
+    public function currentCrossReferences()
+    {
+        return $this->hasMany(CrossReference::class)->whereNull('superseded_by');
+    }
+
 }

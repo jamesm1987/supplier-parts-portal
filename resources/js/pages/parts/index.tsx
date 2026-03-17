@@ -11,7 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import * as PartRoutes from '@/routes/parts';
 import type { BreadcrumbItem } from '@/types';
 import type { Part } from '@/types/parts';
-import { Supplier } from '@/types/suppliers';
+import type { Supplier } from '@/types/suppliers';
 import { Taxonomy } from '@/types/taxonomies';
 
 

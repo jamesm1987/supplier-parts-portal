@@ -1,5 +1,5 @@
-import type { TaxonomyTerm } from './taxonomies';
 import type { Supplier } from './suppliers';
+import type { TaxonomyTerm } from './taxonomies';
 
 export type CrossReference = {
   id: number;
@@ -17,4 +17,5 @@ export type Part = {
     contents: string;
     taxonomy_terms: TaxonomyTerm[];
     crossReferences: CrossReference[];
+    crossReferencesCount?: number;
 };

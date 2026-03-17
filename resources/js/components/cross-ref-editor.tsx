@@ -21,7 +21,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import * as PartRoutes from '@/routes/parts';
-import { CrossReference } from '@/types/parts';
+import type { CrossReference } from '@/types/parts';
 import type { Part} from '@/types/parts';
 import type { Supplier } from '@/types/suppliers';
 
@@ -41,6 +41,8 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
     superseded_by: '',
     superseded_part: ''
   });
+
+  console.log(part);
 
   const [addMode, setAddMode] = useState('crossRef');
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -147,12 +149,17 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
     });
   };
 
-  const getSupersessionTarget = (ref: CrossReference) => {
-    if (!ref.superseded_by) return null;
-    return crossRefs.find(r => r.id === ref.superseded_by);
+  const getSupersessionChain = (ref: CrossReference): CrossReference[] => {
+    const chain: CrossReference[] = [];
+    let current = ref;
+    while (current.superseded_by) {
+      const next = crossRefs.find(r => r.id === current.superseded_by);
+      if (!next) break;
+      chain.push(next);
+      current = next;
+    }
+    return chain;
   };
-
-  if (!open) return null;
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent className="w-full sm:max-w-xl">
@@ -291,11 +298,14 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
                             </Select>
                           </div>
 
-                          {supersededByRef && (
-                            <p className="text-xs text-muted-foreground mt-1 ml-6">
-                              → {supersededByRef.supplier.name} {supersededByRef.part_number}
-                            </p>
-                          )}
+                          {(() => {
+                            const chain = getSupersessionChain(ref);
+                            return chain.length > 0 ? (
+                              <p className="text-xs text-muted-foreground mt-1 ml-6">
+                                → {chain.map(c => `${c.supplier.name} ${c.part_number}`).join(' → ')}
+                              </p>
+                            ) : null;
+                          })()}
                         </div>
                       </div>
                     );

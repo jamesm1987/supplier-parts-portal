@@ -21,7 +21,7 @@ class PartController extends Controller
                 'description' => $part->description,
                 'contents' => $part->contents,
                 'taxonomy_terms' => $part->taxonomyTerms,
-                'crossReferences' => $part->crossReferences->latest()->map(function ($crossRef) {
+                'crossReferences' => $part->crossReferences->map(function ($crossRef) {
                     return [
                         'id' => $crossRef->id,
                         'part_number' => $crossRef->part_number,
@@ -30,8 +30,10 @@ class PartController extends Controller
                         'superseded_by' => $crossRef->superseded_by,
                     ];
                 }),
+                'crossReferencesCount' => $part->currentCrossReferences->count(),
             ];
         });
+
         $taxonomies = Taxonomy::with('terms')->get();
         $suppliers = Supplier::all();
 

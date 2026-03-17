@@ -25,14 +25,12 @@ export const getColumns = (onEdit: (part: Part) => void, onManageCrossRefs: (par
         {
             header: "Cross Refs",
             cell: ({ row }) => {
-                const crossRefs = row.original.crossReferences || row.original.crossReferences;
+                const crossRefs = row.original.crossReferencesCount || row.original.crossReferencesCount;
 
-                if (!crossRefs) return 0;
-                // Handle array
-                if (Array.isArray(crossRefs)) {
-                    return crossRefs.length;
-                }
-                return 0;
+
+
+                    return crossRefs;
+
             },
         },
         {
