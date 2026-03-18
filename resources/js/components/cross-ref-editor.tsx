@@ -42,8 +42,6 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
     superseded_part: ''
   });
 
-  console.log(part);
-
   const [addMode, setAddMode] = useState('crossRef');
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editSupplierId, setEditSupplierId] = useState('');
@@ -59,10 +57,16 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
     }
   }, [open, part, setData, reset, clearErrors]);
 
+  const crossRefs = part?.crossReferences ?? [];
+  const safeSuppliers = suppliers ?? [];
+
+  useEffect(() => {
+    if (crossRefs.length === 0 && addMode === 'supersession') {
+      setAddMode('crossRef');
+    }
+  }, [crossRefs.length, addMode]);
+
   if (!part) return null;
-
-  const crossRefs = part.crossReferences ?? [];
-
 
   const handleAdd = () => {
     if (addMode === 'crossRef') {
@@ -149,16 +153,20 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
     });
   };
 
-  const getSupersessionChain = (ref: CrossReference): CrossReference[] => {
-    const chain: CrossReference[] = [];
+  const getSupersessionHistory = (ref: CrossReference): CrossReference[] => {
+    // Build the chain of previous versions that this ref supersedes.
+    // (i.e., refs whose `superseded_by` points to the current ref)
+    const history: CrossReference[] = [];
     let current = ref;
-    while (current.superseded_by) {
-      const next = crossRefs.find(r => r.id === current.superseded_by);
-      if (!next) break;
-      chain.push(next);
-      current = next;
+
+    while (true) {
+      const previous = crossRefs.find((r) => r.superseded_by === current.id);
+      if (!previous) break;
+      history.push(previous);
+      current = previous;
     }
-    return chain;
+
+    return history;
   };
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -189,9 +197,11 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {crossRefs.map((ref) => {
-                    const supersededByRef = getSupersessionTarget(ref);
-                    const isEditing = editingId === ref.id;
+                  {crossRefs
+                    .filter((ref) => !ref.superseded_by)
+                    .map((ref) => {
+                      const history = getSupersessionHistory(ref);
+                      const isEditing = editingId === ref.id;
 
                     return (
                       <div
@@ -211,7 +221,7 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
                                     <SelectValue placeholder="Select supplier" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {suppliers.map((supplier) => (
+                                    {safeSuppliers.map((supplier) => (
                                       <SelectItem key={supplier.id} value={supplier.id.toString()}>
                                         {supplier.name}
                                       </SelectItem>
@@ -248,6 +258,11 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
                                 <Badge variant="secondary" className="text-xs">
                                   {ref.supplier.name}
                                 </Badge>
+                                {history.length > 0 ? (
+                                  <span className="text-xs text-muted-foreground">
+                                    Supersedes {history.map((h) => `${h.supplier.name} ${h.part_number}`).join(' → ')}
+                                  </span>
+                                ) : null}
                               </div>
                             </div>
                             <div className="flex items-center gap-1">
@@ -298,14 +313,6 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
                             </Select>
                           </div>
 
-                          {(() => {
-                            const chain = getSupersessionChain(ref);
-                            return chain.length > 0 ? (
-                              <p className="text-xs text-muted-foreground mt-1 ml-6">
-                                → {chain.map(c => `${c.supplier.name} ${c.part_number}`).join(' → ')}
-                              </p>
-                            ) : null;
-                          })()}
                         </div>
                       </div>
                     );
@@ -331,17 +338,19 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
                           >
                               Cross-Reference
                           </button>
-                          <button
-                              type="button"
-                              onClick={() => setAddMode('supersession')}
-                              className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                                  addMode === 'supersession'
-                                      ? 'bg-primary text-primary-foreground'
-                                      : 'text-muted-foreground hover:text-foreground'
-                              }`}
-                          >
-                              Supersession
-                          </button>
+                          {crossRefs.length > 0 && (
+                              <button
+                                  type="button"
+                                  onClick={() => setAddMode('supersession')}
+                                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                                      addMode === 'supersession'
+                                          ? 'bg-primary text-primary-foreground'
+                                          : 'text-muted-foreground hover:text-foreground'
+                                  }`}
+                              >
+                                  Supersession
+                              </button>
+                          )}
                       </div>
                   </div>
 
@@ -360,7 +369,7 @@ export const CrossRefEditor = ({ part, suppliers, open, onOpenChange }: CrossRef
                                           </SelectTrigger>
                                       </FormControl>
                                       <SelectContent position="item-aligned">
-                                          {suppliers.map((supplier) => (
+                                          {safeSuppliers.map((supplier) => (
                                               <SelectItem key={supplier.id} value={supplier.id.toString()}>{supplier.name}</SelectItem>
                                           ))}
                                       </SelectContent>
